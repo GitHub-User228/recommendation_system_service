@@ -1,10 +1,21 @@
-# Instructions on how to run the whole pipeline
+# Instructions on how to run the pipeline
 
 Each instruction is executed from the repository directory
 
 ## 1. Installation
 
-Install `openjdk-8-jdk` and `Conda` on the machine and initialize it before proceeding.
+Fill in the `.env_template` file with the necessary environment variables and rename it to `.env`.
+
+
+Install `openjdk-8-jdk`
+
+```
+sudo apt-get install openjdk-8-jdk
+```
+
+Install `Conda` on the machine and initialize it.
+
+Now, follow the instructions below to create the conda environment and install the dependencies.
 
 ```python
 
@@ -29,12 +40,20 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-## 2. Running the pipeline
+## 2. Start the MLFlow server
+
+Run the following command to start the MLFlow server:
+
+```bash
+bash experiments/mlflow_server/start.sh
+```
+
+## 3. Running the pipeline
 
 Run the following command to run the pipeline:
 
 ```bash
-bash experiments/scripts/pipeline/run.sh
+bash experiments/scripts/pipeline/run.sh -p true -m true -f 1,2,3 -a 1,2,3,4,5 -b 1,2,3,4,5 -i 1,2,3,4,5 -t 1,2,3,4,5 -e 1,2,3,4,5
 ```
 
 Check [run.sh](/experiments/scripts/pipeline/run.sh) to see how to specify command line arguments so that only specific components are invoked
