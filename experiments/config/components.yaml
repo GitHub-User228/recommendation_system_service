@@ -1,0 +1,76 @@
+experiment_name: "recsys_yandex_music"
+
+PreprocessingComponentConfig:
+  run_name: 'preprocessing'
+  catalog_names_filename: 'catalog_names.parquet'
+  tracks_filename: 'tracks.parquet'
+  interactions_filename: 'interactions.parquet'
+  train_test_split_date: '2022-12-16'
+  target_test_split_date: '2022-12-23'
+
+MatrixBuilderComponentConfig:
+  run_name: 'matrices'
+  batch_size: 1000
+
+FeaturesGeneratorComponentConfig:
+  run_name: 'features_generation'
+  reference_date: '2022-12-16'
+
+EDAComponentConfig:
+  run_name: 'eda'
+
+ALSModelComponentConfig:
+  run_name: 'base_model_als'
+  n_recommendations: 10
+  min_users_per_item: 300
+  max_similar_items: 10
+  factors: 200
+  iterations: 15
+  regularization: 0.05
+  alpha: 
+  calculate_training_loss: True
+  random_state: 42
+BPRModelComponentConfig:
+  run_name: 'base_model_bpr'
+  n_recommendations: 10
+  min_users_per_item: 300
+  max_similar_items: 10
+  factors: 200
+  iterations: 50
+  learning_rate: 0.05
+  regularization: 0.0001
+  verify_negative_samples: True
+  random_state: 42
+Item2ItemModelComponentConfig:
+  run_name: 'base_model_item2item'
+  batch_size: 500
+  n_recommendations: 10
+  min_users_per_item: 1000
+  n_neighbors: 1000
+  n_components: 100
+  similarity_criteria: 'manhattan'
+
+TopItemsModelComponentConfig:
+  run_name: 'top_items'
+  top_n_items: 100
+  n_recommendations: 10
+
+EnsembleModelComponentConfig:
+  run_name: 'ranking_model'
+  base_models:
+    - als
+    - bpr
+    - item2item
+  include_top_items: True
+  n_recommendations: 10
+  negative_samples_per_user: 5
+  sampling_seed: 42
+  model_class_name: 'CatBoostClassifier'
+  model_params:
+    loss_function: 'Logloss'
+    auto_class_weights: 'Balanced'
+    iterations: 200
+    random_state: 42
+
+
+

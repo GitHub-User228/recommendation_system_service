@@ -1,0 +1,22 @@
+app:
+  name: "Recommendation System"
+master: "local[*]"
+config:
+  spark.driver.memory: "6g"
+  spark.executor.memory: "10g"
+  spark.executor.cores: 16
+  spark.memory.fraction: 0.5
+  spark.memory.storageFraction: 0.2
+  spark.memory.offHeap.size: "5g"
+  spark.memory.offHeap.enabled: True
+  spark.sql.shuffle.partitions: 200
+  spark.sql.parquet.block.size: 33554432 # 32 MB
+  spark.rdd.compress: True
+  spark.shuffle.compress: True
+  spark.shuffle.spill.compress: True
+  spark.driver.maxResultSize: '2g'
+  spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+  spark.executor.extraJavaOptions: "-XX:+UseG1GC"
+  spark.driver.extraJavaOptions: "-XX:+UseG1GC"
+#  checkpoint_dir: "{{ ARTIFACTS_DIR }}/.checkpoint"
+log_level: "ERROR"
