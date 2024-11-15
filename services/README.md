@@ -49,7 +49,6 @@ In case of `docker compose` deployment, the following services are also availabl
 - **[entrypoints](/services/ml_service/entrypoints)**: This directory contains files related to the ML microservice entrypoints:
     - [entrypoint_single.sh](/services/ml_service/entrypoints/entrypoint_single.sh): Entrypoint for the ML microservice in the `docker container` configuration
     - [entrypoint_compose.sh](/services/ml_service/entrypoints/entrypoint_compose.sh): Entrypoint for the ML microservice in the `docker compose` configuration
-- **[params](/services/ml_service/params)**: This directory contains example queries as json files
 - **[scripts](/services/ml_service/scripts)**: This directory contains Python scripts used by ML microservice
 - **[app](/services/ml_service/app)**: This directory contains FastAPI apps as Python files:
     - [app_simple.py](/services/ml_service/app/app_simple.py): FastAPI app for the ML microservice in the `docker container` or `conda environment` configuration
@@ -69,3 +68,22 @@ In case of `docker compose` deployment, the following services are also availabl
 ## Getting Started
 
 Follow the guides in [Instructions.md](Instructions.md) to run the microservice.
+
+## How the recommendations are made
+
+The microservice must receive the following parameters in order to make recommendations:
+- `user_id` - user ID
+- `k` - number of recommendations to be made (must be within the defined range)
+
+There are 4 different combinations of recommendations the user can receive:
+1. Offline only recommendations - the user has history data, but have not yet interacted with new items
+2. Popular only recommendations - the user has no history data and has not yet interacted with new items
+3. Offline + online recommendations - the user has history data and has interacted with new items (has data in events store)
+4. Popular + online recommendations - the user has no history data and has interacted with new items (has data in events store)
+
+In case of an invalid request or some errors in the microservice, the corresponding error response will be returned.
+
+Since there are multiple sources of recommendations, it is essential to specify the way to combine them:
+1. top `k` items according to similarity score are retrieved from online recommendations of a single source given a list of items from events store
+2. top `k` items are retrieved in the round-robin fashion (preserving the original order) from different sources of online recommendations after applying the first step for each one
+3. top `k` items are retrieved by combining the result of step 2 (online recs) and either offline or popular recommendations in the round-robin fashion. Online recs are given higher priority in any case (e.g. the first item in the recs is from online recommendations)

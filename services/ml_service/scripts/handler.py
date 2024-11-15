@@ -214,32 +214,3 @@ class FastApiHandler:
         """
         self.logger.info("Closing FastApiHandler...")
         self.logger.info("Closing completed.")
-
-
-# async def main() -> None:
-#     """
-#     Main function to test the FastApiHandler by loading example queries
-#     from JSON files and printing the corresponding responses.
-#     """
-
-#     # Initialize the Fast API handler
-#     handler = FastApiHandler()
-
-#     # Iterate over each JSON file in the directory
-#     for file in env_vars.param_dir.glob("*.json"):
-#         try:
-#             # Load the example query
-#             test_query = read_json(file)
-#             print(f"Query from {file.name}: {test_query}")
-
-#             # Handle the request and get the response
-#             response = await handler.handle(test_query)
-#             print(f"Response: {response}\n")
-#         except HTTPException as http_exc:
-#             print(f"HTTPException for {file.name}: {http_exc.detail}\n")
-#         except Exception as exc:
-#             print(f"Unhandled exception for {file.name}: {str(exc)}\n")
-
-
-# if __name__ == "__main__":
-#     asyncio.run(main())

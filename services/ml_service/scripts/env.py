@@ -30,7 +30,6 @@ class EnviromentVariables(BaseSettings):
 
     log_dir: Path
     config_dir: Path
-    param_dir: Path
     events_store_dir: Path
     offline_recs_dir: Path
     online_recs_dir: Path
@@ -78,7 +77,6 @@ class EnviromentVariables(BaseSettings):
                 if k in [
                     "log_dir",
                     "config_dir",
-                    "param_dir",
                     "events_store_dir",
                     "offline_recs_dir",
                     "online_recs_dir",
