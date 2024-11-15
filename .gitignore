@@ -2,6 +2,9 @@ experiments/artifacts/*
 experiments/mlruns
 catboost_info
 *.parquet
+*.csv
+events.json
+test_events.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -62,6 +65,7 @@ cover/
 
 # Django stuff:
 *.log
+!test_service.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
