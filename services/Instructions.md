@@ -10,6 +10,8 @@ Then perform the following imports of the data:
 - `similar_items_bpr.parquet` with similar items data to [online](/services/ml_service/data/online) directory.
 - `top_items.parquet` with popular items data to [popular](/services/ml_service/data/popular) directory.
 
+For convinience, you can download all parquet files from [here](https://drive.google.com/drive/folders/10euUScsb8jBPVRBYHUMZrgoox_5F8oDX?usp=sharing)
+
 ## 1. FastAPI microservice via conda environment
 
 Install Conda on the machine and initialize it before proceeding.
