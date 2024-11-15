@@ -106,12 +106,12 @@ class ALSModelComponent(BaseModelComponent):
         )
         logger.info("Saved similar items data")
 
-    def recommend(self, subset: Literal["target", "test"]) -> None:
+    def recommend(self, subset: Literal["all", "target", "test"]) -> None:
         """
         Generate recommendations for the specified subset.
 
         Args:
-            subset (Literal["target", "test"]):
+            subset (Literal["all", "target", "test"]):
                 The subset of data for which recommendations are to be
                 generated.
         """
@@ -126,17 +126,25 @@ class ALSModelComponent(BaseModelComponent):
         logger.info("Loaded user_items_matrix")
 
         # Retrieve users
-        user_ids = (
-            pd.read_parquet(
+        if subset in ["test", "target"]:
+            user_ids = (
+                pd.read_parquet(
+                    Path(
+                        self.config.source_path,
+                        self.config.events_filenames[subset],
+                    ),
+                    columns=[self.config.fields_id["user"]],
+                )[self.config.fields_id["user"]]
+                .unique()
+                .tolist()
+            )
+        elif subset == "all":
+            user_ids = read_pkl(
                 Path(
-                    self.config.source_path,
-                    self.config.events_filenames[subset],
-                ),
-                columns=[self.config.fields_id["user"]],
-            )[self.config.fields_id["user"]]
-            .unique()
-            .tolist()
-        )
+                    self.config.source_path2,
+                    self.config.encoders_filenames["user"],
+                )
+            ).classes_.tolist()
         logger.info(f"Retrieved user IDs for subset '{subset}'")
 
         # Loading the trained ALS model
@@ -184,11 +192,13 @@ def main():
     elif args.stage == 3:
         ALSModelComponent().recommend(subset="test")
     elif args.stage == 4:
-        ALSModelComponent().evaluate()
+        ALSModelComponent().recommend(subset="all")
     elif args.stage == 5:
+        ALSModelComponent().evaluate()
+    elif args.stage == 6:
         ALSModelComponent().log()
     else:
-        raise ValueError("Invalid --stage. Must be 1, 2, 3, 4, 5")
+        raise ValueError("Invalid --stage. Must be 1, 2, 3, 4, 5, 6")
 
     logger.info(f"ALSModelComponent stage {args.stage} completed successfully")
 

@@ -28,26 +28,27 @@ class EnsembleModelComponent(BaseModelComponent):
         self._path_to_script = Path(__file__)
 
     def _merge_data(
-        self, subset: Literal["train_df", "test_df"]
+        self, subset: Literal["train_df", "test_df", "all"]
     ) -> pd.DataFrame:
         """
         Merges data from multiple base models for the specified subset.
 
         Args:
-            subset (Literal["train_df", "test_df"]):
+            subset (Literal["train_df", "test_df", 'all']):
                 The data subset to merge.
 
         Returns:
             pd.DataFrame:
                 The merged DataFrame containing data from all base models.
         """
-        if subset not in ["train_df", "test_df"]:
+        if subset not in ["train_df", "test_df", "all"]:
             raise ValueError(f"Invalid subset: {subset}")
 
         path_dict = self.config.train_data_path
         if subset == "test_df":
             path_dict = self.config.test_data_path
-
+        elif subset == "all":
+            path_dict = self.config.all_data_path
         id_cols = set(
             [
                 self.config.fields_id["user"],
@@ -356,12 +357,13 @@ class EnsembleModelComponent(BaseModelComponent):
         merging the base models' data, adding user and item features.
         The resulting data is saved.
         """
-        for subset in ["train_df", "test_df"]:
+        for subset in ["train_df", "test_df", "all"]:
             df = self._merge_data(subset)
             if self.config.include_top_items:
                 df = self._add_top_items(df)
-            df = self._add_target(df, subset)
-            if subset == "train":
+            if subset != "all":
+                df = self._add_target(df, subset)
+            if subset == "train_df":
                 df = self._filter_data(df)
             df = self._add_features(df, kind="user")
             df = self._add_features(df, kind="item")
@@ -443,19 +445,23 @@ class EnsembleModelComponent(BaseModelComponent):
         )
         logger.info("Saved feature importances")
 
-    def recommend(self) -> None:
+    def recommend(self, subset: Literal["all", "test_df"]) -> None:
         """
-        Ranks recommendations on the test data
+        Ranks recommendations on the subset of data.
+
+        Args:
+            subset (Literal["all", "test_df"]):
+                The subset of data.
         """
 
         # Read test data
         df = pd.read_parquet(
             Path(
                 self.config.destination_path,
-                self.config.recommendations_filenames["test_df"],
+                self.config.recommendations_filenames[subset],
             ),
         )
-        logger.info("Read test data")
+        logger.info(f"Read data for subset {subset}")
 
         # Separate names of columns with features
         features = list(
@@ -474,14 +480,14 @@ class EnsembleModelComponent(BaseModelComponent):
             path=Path(self.config.destination_path, self.config.model_filename)
         )
 
-        # Predicting on the test data
+        # Predict
         df[self.config.score_col] = model.predict_proba(df[features])[:, 1]
-        logger.info("Ranked recommendations on the test data")
+        logger.info("Ranked recommendations")
 
         # Omit columns with features
         df.drop(columns=features, inplace=True)
 
-        # Leaving top recommendations
+        # Leave top recommendations
         df = (
             df.sort_values(
                 by=[self.config.fields_id["user"], self.config.score_col],
@@ -495,13 +501,14 @@ class EnsembleModelComponent(BaseModelComponent):
         )
 
         # Saving recommendations
+        key = "test" if subset == "test_df" else "all"
         df.to_parquet(
             Path(
                 self.config.destination_path,
-                self.config.recommendations_filenames["test"],
+                self.config.recommendations_filenames[key],
             ),
         )
-        logger.info("Saved recommendations")
+        logger.info(f"Saved recommendations for subset {subset}")
 
 
 def main():
@@ -522,13 +529,15 @@ def main():
     elif args.stage == 2:
         EnsembleModelComponent().fit()
     elif args.stage == 3:
-        EnsembleModelComponent().recommend()
+        EnsembleModelComponent().recommend(subset="test_df")
     elif args.stage == 4:
-        EnsembleModelComponent().evaluate()
+        EnsembleModelComponent().recommend(subset="all")
     elif args.stage == 5:
+        EnsembleModelComponent().evaluate()
+    elif args.stage == 6:
         EnsembleModelComponent().log()
     else:
-        raise ValueError("Invalid --stage. Must be 1, 2, 3, 4, 5")
+        raise ValueError("Invalid --stage. Must be 1, 2, 3, 4, 5, 6")
 
     logger.info(
         f"EnsembleModelComponent stage {args.stage} completed successfully"

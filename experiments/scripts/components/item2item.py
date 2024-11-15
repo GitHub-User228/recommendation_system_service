@@ -101,12 +101,12 @@ class Item2ItemModelComponent(BaseModelComponent):
             cloudpickle.dumps(models.Item2ItemModel)
             cloudpickle.dump(model, f)
 
-    def recommend(self, subset: Literal["target", "test"]) -> None:
+    def recommend(self, subset: Literal["all", "target", "test"]) -> None:
         """
         Generate recommendations for the specified subset.
 
         Args:
-            subset (Literal["target", "test"]):
+            subset (Literal["all", "target", "test"]):
                 The subset of data for which recommendations are to be
                 generated.
         """
@@ -121,17 +121,25 @@ class Item2ItemModelComponent(BaseModelComponent):
         logger.info("Loaded user_items_matrix")
 
         # Retrieve users
-        user_ids = (
-            pd.read_parquet(
+        if subset in ["test", "target"]:
+            user_ids = (
+                pd.read_parquet(
+                    Path(
+                        self.config.source_path,
+                        self.config.events_filenames[subset],
+                    ),
+                    columns=[self.config.fields_id["user"]],
+                )[self.config.fields_id["user"]]
+                .unique()
+                .tolist()
+            )
+        elif subset == "all":
+            user_ids = read_pkl(
                 Path(
-                    self.config.source_path,
-                    self.config.events_filenames[subset],
-                ),
-                columns=[self.config.fields_id["user"]],
-            )[self.config.fields_id["user"]]
-            .unique()
-            .tolist()
-        )
+                    self.config.source_path2,
+                    self.config.encoders_filenames["user"],
+                )
+            ).classes_.tolist()
         logger.info(f"Retrieved user IDs for subset '{subset}'")
 
         # Loading the trained model
@@ -142,10 +150,10 @@ class Item2ItemModelComponent(BaseModelComponent):
         model.recommend(
             user_ids=user_ids,
             user_items_matrix=user_items_matrix,
-            n_recommendations=self.config.n_recommendation,
+            n_recommendations=self.config.n_recommendations,
             user_id_col=self.config.fields_id["user"],
             item_id_col=self.config.fields_id["item"],
-            score_col=self.config.score_col_name,
+            score_col=self.config.score_col,
             batch_size=self.config.batch_size,
             save_path=Path(
                 self.config.destination_path,
@@ -175,11 +183,13 @@ def main():
     elif args.stage == 3:
         Item2ItemModelComponent().recommend(subset="test")
     elif args.stage == 4:
-        Item2ItemModelComponent().evaluate()
+        Item2ItemModelComponent().recommend(subset="all")
     elif args.stage == 5:
+        Item2ItemModelComponent().evaluate()
+    elif args.stage == 6:
         Item2ItemModelComponent().log()
     else:
-        raise ValueError("Invalid --stage. Must be 1, 2, 3, 4, 5")
+        raise ValueError("Invalid --stage. Must be 1, 2, 3, 4, 5, 6")
 
     logger.info(
         f"Item2ItemModelComponent stage {args.stage} completed successfully"

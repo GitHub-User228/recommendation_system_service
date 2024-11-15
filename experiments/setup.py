@@ -18,7 +18,9 @@ def parse_requirements(path: Path):
     """
     with open(path, "r") as file:
         return [
-            line.strip() for line in file if line.strip() and not line.startswith("#")
+            line.strip()
+            for line in file
+            if line.strip() and not line.startswith("#")
         ]
 
 

@@ -12,8 +12,8 @@ from typing import List, Any, Literal
 from sklearn.preprocessing import LabelEncoder
 from sklearn.neighbors import NearestNeighbors
 from sklearn.decomposition import TruncatedSVD
-from implicit.gpu.als import AlternatingLeastSquares
-from implicit.gpu.bpr import BayesianPersonalizedRanking
+from implicit.als import AlternatingLeastSquares
+from implicit.bpr import BayesianPersonalizedRanking
 
 
 class BaseRecommender(ABC):
@@ -805,7 +805,7 @@ class ALS(BaseRecommender):
         item_ids_enc = list(range(len(self.item_id_encoder.classes_)))
         similar_item_ids_enc, scores = self.model.similar_items(
             item_ids_enc,
-            N=max_similar_items,
+            N=max_similar_items + 1,
         )
         self._logger.info("Generated similar items")
 
@@ -1178,7 +1178,7 @@ class BPR(BaseRecommender):
         item_ids_enc = list(range(len(self.item_id_encoder.classes_)))
         similar_item_ids_enc, scores = self.model.similar_items(
             item_ids_enc,
-            N=max_similar_items,
+            N=max_similar_items + 1,
         )
         self._logger.info("Generated similar items")
 

@@ -75,11 +75,11 @@ RUN_ENSEMBLE=false
 
 # Default sub-stages to run
 FEATURES_STAGE="1,2,3"
-ALS_STAGE="1,2,3,4,5"
-BPR_STAGE="1,2,3,4,5"
-ITEM2ITEM_STAGE="1,2,3,4,5"
-TOP_ITEMS_STAGE="1,2,3,4,5"
-ENSEMBLE_STAGE="1,2,3,4,5"
+ALS_STAGE="1,2,3,4,5,6"
+BPR_STAGE="1,2,3,4,5,6"
+ITEM2ITEM_STAGE="1,2,3,4,5,6"
+TOP_ITEMS_STAGE="1,2,3,4,5,6"
+ENSEMBLE_STAGE="1,2,3,4,5,6"
 
 # Parse command-line options
 while getopts "p:m:f:a:b:i:t:e:" opt; do

@@ -27,7 +27,7 @@ ALSModelComponentConfig:
   factors: 200
   iterations: 15
   regularization: 0.05
-  alpha: 
+  alpha: 1.0
   calculate_training_loss: True
   random_state: 42
 BPRModelComponentConfig:

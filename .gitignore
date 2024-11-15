@@ -1,6 +1,7 @@
 experiments/artifacts/*
 experiments/mlruns
 catboost_info
+*.parquet
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

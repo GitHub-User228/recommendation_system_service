@@ -53,7 +53,7 @@ bash experiments/mlflow_server/start.sh
 Run the following command to run the pipeline:
 
 ```bash
-bash experiments/scripts/pipeline/run.sh -p true -m true -f 1,2,3 -a 1,2,3,4,5 -b 1,2,3,4,5 -i 1,2,3,4,5 -t 1,2,3,4,5 -e 1,2,3,4,5
+bash experiments/scripts/pipeline/run.sh -p true -m true -f 1,2,3 -a 1,2,3,4,5,6 -b 1,2,3,4,5,6 -i 1,2,3,4,5,6 -t 1,2,3,4,5,6 -e 1,2,3,4,5
 ```
 
 Check [run.sh](/experiments/scripts/pipeline/run.sh) to see how to specify command line arguments so that only specific components are invoked

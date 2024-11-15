@@ -326,6 +326,7 @@ class ALSModelComponentConfig(BaseConfig):
     )
     recommendations_filenames: Dict[str, str] = Field(
         default={
+            "all": "all.parquet",
             "target": "target.parquet",
             "test": "test.parquet",
         },
@@ -409,6 +410,7 @@ class BPRModelComponentConfig(BaseConfig):
     )
     recommendations_filenames: Dict[str, str] = Field(
         default={
+            "all": "all.parquet",
             "target": "target.parquet",
             "test": "test.parquet",
         },
@@ -490,6 +492,7 @@ class Item2ItemModelComponentConfig(BaseConfig):
     )
     recommendations_filenames: Dict[str, str] = Field(
         default={
+            "all": "all.parquet",
             "target": "target.parquet",
             "test": "test.parquet",
         },
@@ -556,6 +559,7 @@ class TopItemsModelComponentConfig(BaseConfig):
     )
     recommendations_filenames: Dict[str, str] = Field(
         default={
+            "all": "all.parquet",
             "target": "target.parquet",
             "test": "test.parquet",
         },
@@ -590,6 +594,8 @@ class EnsembleModelComponentConfig(BaseConfig):
     )
 
     base_models: List[str] = Field(description="List of base models aliases")
+
+    all_data_path: Dict[str, str] = Field(default={})
     train_data_path: Dict[str, str] = Field(
         default={},
         description=(
@@ -635,6 +641,7 @@ class EnsembleModelComponentConfig(BaseConfig):
             "train_df": "train_df.parquet",
             "test_df": "test_df.parquet",
             "test": "test.parquet",
+            "all": "recommendations.parquet",
         },
         description="Filenames of files with recommendations.",
     )
@@ -707,6 +714,10 @@ class EnsembleModelComponentConfig(BaseConfig):
             self.test_data_path[alias] = Path(
                 model_config.destination_path,
                 model_config.recommendations_filenames["test"],
+            )
+            self.all_data_path[alias] = Path(
+                model_config.destination_path,
+                model_config.recommendations_filenames["all"],
             )
 
         return self
