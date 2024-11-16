@@ -2,7 +2,7 @@
 
 Each instruction is executed from the repository directory.
 
-To begin with, fill in the `.env_template` file with the necessary environment variables and rename it to `.env`.
+To begin with, adjust variables in the `.env_template` file (if you need) and rename it to `.env`.
 
 Then perform the following imports of the data:
 - `recommendations.parquet` with final offline recs to [offline](/services/ml_service/data/offline) directory.
@@ -27,7 +27,7 @@ conda activate venv_rss2
 echo "UID=$(id -u)" >> services/.env
 echo "GID=$(id -g)" >> services/.env
 
-# export the environment variables for the .env
+# export the environment variables from the .env
 conda env config vars set $(cat services/.env | tr '\n' ' ')
 
 # reactive the conda environment
@@ -190,5 +190,5 @@ You should recieve `{"result":"ok"}` in case of successful request.
 
 Addresses of the services:
 - microservice: [http://localhost:4602](http://localhost:4602)
-- Prometheus: [http://localhost:3000](http://localhost:3000)
-- Grafana: [http://localhost:9090](http://localhost:9090)
+- Prometheus: [http://localhost:9090](http://localhost:9090)
+- Grafana: [http://localhost:3000](http://localhost:3000)

@@ -19,10 +19,6 @@ class EnviromentVariables(BaseSettings):
         env_file=".env", env_file_encoding="utf-8"
     )
 
-    s3_bucket_name: str
-    aws_access_key_id: str
-    aws_secret_access_key: str
-
     host: str
     app_docker_port: int
     app_vm_port: int
